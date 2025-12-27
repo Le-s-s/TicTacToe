@@ -1,0 +1,22 @@
+.container{
+    display:flex;
+    flex-direction:column;
+    height:100vh;
+    width:100vw;
+}
+
+.gameBoard{
+    height:80%;
+    width:100%;
+    display:grid;
+    grid-template-columns: repeat(3, 1fr);
+}
+
+.tile {
+    height:100%;
+    width:100%;
+    font-size:10vh;;
+    border-style:double;
+    text-align:center;
+    align-content:center;
+}
