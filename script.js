@@ -1,24 +1,44 @@
-let pTurn = 0;
-
-function gameLogic (p1,p2,board,tile){
-    turn(p1,p2,tile);
-    console.log(`turn exited`);
+function gameLogic (p1,p2,board,tile,index, getTurn, setTurn){
+    const turn = getTurn();
+    if (board[index] !== null) return;
+    if (turn === 0){
+        tile.textContent = `${p1.tile}`;
+        board[index] = p1.id;
+        setTurn(1);
+        console.log(`${p1.name} turn`);
+    }
+    else {
+        tile.textContent = `${p2.tile}`;
+        board[index] = p2.id;
+        setTurn(0);
+        console.log(`${p2.name} turn`);
+    }
     const winner = didWin(p1,p2,board);
-    if (winner === p1.name || winner === p2.name) alert(winner);
-    console.log(tile);
-    console.log(p1.name,p2.name);
+    if (winner === p1.name || winner === p2.name){ 
+        alert(`${winner} wins, new game beginning.`);
+        let game = document.querySelector('.gameBoard');
+        game.innerHTML = ""
+        TicTacToe()
+    }
+    // when board is not empty and no one won, restart.
+    if (!board.includes(null) && !winner) {
+    alert("Draw! New game beginning.");
+    document.querySelector('.gameBoard').innerHTML = "";
+    TicTacToe();
+}
+    
 };
 
-function displayBoard(p1,p2){
-    const board = [11,12,13,21,22,23,31,32,33];
+function displayBoard(p1, p2, getTurn, setTurn){
+    const board = Array(9).fill(null);
     const displayBoard = document.querySelector('.gameBoard');
-    board.forEach(tiles => {
+    board.forEach((_,index) => {
         let tile = document.createElement("div");
         tile.textContent = `-`;
         tile.classList.add("tile");
-        tile.id = tiles;
+
         tile.addEventListener("click", () => {
-            gameLogic(p1,p2,board,tile);
+            gameLogic(p1,p2,board,tile,index, getTurn, setTurn);
         });
         displayBoard.appendChild(tile);
 
@@ -28,31 +48,13 @@ function displayBoard(p1,p2){
 function firstMove(p1,p2){
     let p1Rng = Math.floor(Math.random() * 10);
     let p2Rng = Math.floor(Math.random() * 10);
-    if (p1Rng === p2Rng) firstMove(p1,p2);
+    if (p1Rng === p2Rng) return firstMove(p1,p2);
     if (p1Rng > p2Rng) {
         return [p1,p2];
     }
     else {
         return [p2,p1];
     }
-}
-
-function turn(p1,p2,tile){
-    if (pTurn === 0){
-        tile.textContent = `${p1.tile}`;
-        tile.id = `${p1.tile}`;
-        pTurn++;
-        console.log(`${p1.name} turn`);
-    }
-    else if (pTurn === 1){
-        tile.textContent = `${p2.tile}`;
-        tile.id = `${p2.tile}`;
-        pTurn--;
-        console.log(`${p2.name} turn`);
-    }
-    
-    
-
 }
 
 function didWin(p1,p2,board){
@@ -65,15 +67,15 @@ function didWin(p1,p2,board){
 
     for (let condition of winCon){
         let [a,b,c] = condition;
-        if (board[a].textContent === p1.tile &&
-            board[b].textContent === p1.tile &&
-            board[c].textContent === p1.tile) {
+        if (board[a] === p1.id &&
+            board[b] === p1.id &&
+            board[c] === p1.id) {
                 console.log(`${p1.name} has won`)
                 return p1.name;
         }
-        else if (board[a].textContent === p2.tile &&
-            board[b].textContent === p2.tile &&
-            board[c].textContent === p2.tile) {
+        else if (board[a] === p2.id &&
+            board[b] === p2.id &&
+            board[c] === p2.id) {
                 console.log(`${p2.name} has won`)
                 return p2.name;
         }
@@ -85,19 +87,25 @@ function didWin(p1,p2,board){
 function player(){
     let name = prompt("What is thine name sire?")
     let tile = prompt("x or o?")
-    let id = crypto.randomUUID;
-    return {name,tile};
+    let id = crypto.randomUUID();
+    return {name,tile,id};
 }
 
 
 
 function TicTacToe(){
+    let pTurn = 0;
+
     let player1 = player()
     let player2 = player()
     const [first,second] = firstMove(player1,player2);
 
     console.log(`${first.name} goes first.`)
-    displayBoard(first,second);
+    // Pass players and two closure functions that act as a getter and setter for pTurn.
+    // () => pTurn reads the current turn,
+    // v => pTurn = v mutates the private pTurn variable owned by TicTacToe.
+    // This allows controlled access to private state without globals.
+    displayBoard(first, second, () => pTurn, v => pTurn = v);
     
 }
 
@@ -105,8 +113,6 @@ addEventListener("DOMContentLoaded", (event) => {
     TicTacToe();
 })
 
-// create modular gameboard
-// the gameboard must accept input from a player
-// the player must pick a square
-// if they pick a square, that slot is filled with their assigned x or o
-// they cannot fill a filled square.
+// Todo(if i want to)
+// refine further with ai and visual improvements,
+// quality of life, all that jazz.
