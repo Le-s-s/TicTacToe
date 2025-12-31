@@ -5,27 +5,24 @@ function gameLogic (p1,p2,board,tile,index, getTurn, setTurn){
         tile.textContent = `${p1.tile}`;
         board[index] = p1.id;
         setTurn(1);
-        console.log(`${p1.name} turn`);
+        alert(`${p1.name} turn`);
     }
     else {
         tile.textContent = `${p2.tile}`;
         board[index] = p2.id;
         setTurn(0);
-        console.log(`${p2.name} turn`);
+        alert(`${p2.name} turn`);
     }
     const winner = didWin(p1,p2,board);
     if (winner === p1.name || winner === p2.name){ 
-        alert(`${winner} wins, new game beginning.`);
-        let game = document.querySelector('.gameBoard');
-        game.innerHTML = ""
-        TicTacToe()
+        alert(`${winner} wins!`);
+        clearBoard();
     }
     // when board is not empty and no one won, restart.
     if (!board.includes(null) && !winner) {
-    alert("Draw! New game beginning.");
-    document.querySelector('.gameBoard').innerHTML = "";
-    TicTacToe();
-}
+    alert("Draw!");
+    clearBoard();
+    }
     
 };
 
@@ -84,9 +81,9 @@ function didWin(p1,p2,board){
     return false;
 }
 
-function player(){
-    let name = prompt("What is thine name sire?")
-    let tile = prompt("x or o?")
+function player(inputName,tileChoice){
+    let name = inputName;
+    let tile = tileChoice;
     let id = crypto.randomUUID();
     return {name,tile,id};
 }
@@ -96,11 +93,20 @@ function player(){
 function TicTacToe(){
     let pTurn = 0;
 
-    let player1 = player()
-    let player2 = player()
+    const p1Input = document.querySelector('.p1').value.trim();
+    const p2Input = document.querySelector('.p2').value.trim();
+
+    if (!p1Input || !p2Input) {
+        alert("Both players must enter a name.");
+        return;
+    }
+
+    let player1 = player(p1Input, "x")
+    let player2 = player(p2Input, "o")
+
     const [first,second] = firstMove(player1,player2);
 
-    console.log(`${first.name} goes first.`)
+    alert(`${first.name} goes first.`)
     // Pass players and two closure functions that act as a getter and setter for pTurn.
     // () => pTurn reads the current turn,
     // v => pTurn = v mutates the private pTurn variable owned by TicTacToe.
@@ -110,8 +116,21 @@ function TicTacToe(){
 }
 
 addEventListener("DOMContentLoaded", (event) => { 
-    TicTacToe();
+    const startButton = document.querySelector('.gameStart');
+    const resetButton = document.querySelector('.gameReset');
+
+    startButton.addEventListener("click", () => {
+        TicTacToe();
+    });
+
+    resetButton.addEventListener("click", () => {
+        clearBoard();
+    });
 })
+
+function clearBoard(){
+    document.querySelector('.gameBoard').innerHTML = "";
+}
 
 // Todo(if i want to)
 // refine further with ai and visual improvements,
