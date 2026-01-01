@@ -20,3 +20,16 @@
     text-align:center;
     align-content:center;
 }
+
+.turn {
+    border-width: 0.5vw;
+    border-style: groove;
+    border-color: red;
+}
+
+.controlBoard{
+    display: flex;
+    height: 20%;
+    justify-content: center;
+    gap: 2vw;
+}
